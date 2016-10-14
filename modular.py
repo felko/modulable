@@ -11,6 +11,7 @@ __all__ = (
 import os
 import functools
 from importlib.machinery import SourceFileLoader
+from contextlib import contextmanager
 from pathlib import Path
 from collections import OrderedDict
 
@@ -80,6 +81,11 @@ class _ModularMeta(type):
             return super().__getattribute__(name)
         else:
             return val
+
+    @contextmanager
+    def plugin(cls, name):
+        yield cls.load_plugin(name)
+        cls.unload_plugin(name)
 
     def load_plugin_from_path(cls, path):
         """

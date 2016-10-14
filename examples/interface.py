@@ -39,3 +39,7 @@ if __name__ == '__main__':
     i.run()
     Interface.unload_plugin('it_works')
     i.run()
+
+    with Interface.plugin('it_works') as plugin:
+        print(plugin)
+        i.run()
