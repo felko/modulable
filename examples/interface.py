@@ -22,7 +22,7 @@ class Interface(Modular, plugin_directory='plugins'):
         print('=== Frame:', self.frame, '===')
         self.frame += 1
 
-    def start(self, *args, **kwds):
+    def run(self, *args, **kwds):
         self.init(*args, **kwds)
 
         self.running = True
@@ -32,8 +32,6 @@ class Interface(Modular, plugin_directory='plugins'):
 
 if __name__ == '__main__':
     i = Interface()
-    i.start()
-    print('::', Interface.update)
-    print(Interface.loaded_plugins)
+    i.run()
     Interface.unload_plugin('it_works')
-    i.start()
+    i.run()

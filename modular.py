@@ -1,10 +1,6 @@
 #!/usr/bin/env python3.4
 # coding: utf-8
 
-"""
-
-"""
-
 __all__ = (
     'Plugin',
     'Modular',
@@ -125,7 +121,6 @@ class _ModularMeta(type):
                     mth.fns.remove(val)
                 elif isinstance(mth, overridable):
                     mth.overridden = None
-
 
 
 class Modular(metaclass=_ModularMeta, virtual=True):
