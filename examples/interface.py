@@ -10,13 +10,17 @@ os.chdir('examples')
 class Interface(Modular, plugin_directory='plugins'):
     @modulable
     def init(self, *args, **kwds):
+        """
+        Initialize the interface.
+        """
+
         self.frame = 0
         self.running = False
 
     @modulable
     def update(self):
         """
-        Updates caca
+        Updates the current interface.
         """
 
         print('=== Frame:', self.frame, '===')

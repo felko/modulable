@@ -20,17 +20,38 @@ class Plugin:
     A module that can be injected in a modular class.
     """
 
-    def __init__(self, name, path, module):
+    def __init__(self, name, path, module, on_load=None, on_unload=None):
         self.name = name
         self.path = path
         self.module = module
+
+        self.on_load = on_load or (lambda: None)
+        self.on_unload = on_unload or (lambda: None)
 
     @classmethod
     def load(cls, path):
         spath = str(path.resolve())
         name = os.path.basename(spath).split('.')[0]
         module = SourceFileLoader(name, spath).load_module()
-        return cls(name, path, module)
+        plugin = cls(name, path, module)
+
+        try:
+            on_load = getattr(module, 'on_load')
+        except AttributeError:
+            pass
+        else:
+            delattr(module, 'on_load')
+            plugin.on_load = on_load
+
+        try:
+            on_unload = getattr(module, 'on_unload')
+        except AttributeError:
+            pass
+        else:
+            delattr(module, 'on_unload')
+            plugin.on_unload = on_unload
+
+        return plugin
 
 
 class _ModularMeta(type):
@@ -60,17 +81,17 @@ class _ModularMeta(type):
         else:
             return val
 
-    def load_plugin(cls, name):
+    def load_plugin_from_path(cls, path):
         """
-        Loads a plugin with a given name.
+        Loads a plugin given it's path.
         """
 
-        path = cls.plugin_directory / (name + '.py')
         plugin = Plugin.load(path)
+        plugin.on_load()
 
         for attr, val in cls.__dict__.items():
             try:
-                mod_fn = getattr(module, attr)
+                mod_fn = getattr(plugin.module, attr)
             except AttributeError:
                 pass
             else:
@@ -79,9 +100,18 @@ class _ModularMeta(type):
                 elif isinstance(val, overridable):
                     val.override(mod_fn)
 
-        cls.loaded_plugins[name] = plugin
+        cls.loaded_plugins[plugin.name] = plugin
 
         return plugin
+
+    def load_plugin(cls, name):
+        """
+        Loads a plugin with a given name.
+        """
+
+        path = cls.plugin_directory / (name + '.py')
+        return cls.load_plugin_from_path(path)
+
 
     def load_plugins(cls):
         """
@@ -89,20 +119,7 @@ class _ModularMeta(type):
         """
 
         for path in cls.plugin_directory.glob('*.py'):
-            plugin = Plugin.load(path)
-
-            for attr, val in cls.__dict__.items():
-                try:
-                    mod_fn = getattr(plugin.module, attr)
-                except AttributeError:
-                    pass
-                else:
-                    if isinstance(val, modulable):
-                        val.inject(mod_fn)
-                    elif isinstance(val, overridable):
-                        val.override(mod_fn)
-
-            cls.loaded_plugins[plugin.name] = plugin
+            cls.load_plugin_from_path(path)
 
     def unload_plugin(cls, name):
         """
@@ -110,6 +127,7 @@ class _ModularMeta(type):
         """
 
         plugin = cls.loaded_plugins.pop(name)
+        plugin.on_unload()
 
         for attr, val in plugin.module.__dict__.items():
             try:

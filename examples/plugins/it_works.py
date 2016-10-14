@@ -3,3 +3,6 @@
 
 def update(self):
     print('working')
+
+def on_unload():
+    print('Unloading it_works...')
