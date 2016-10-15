@@ -5,7 +5,8 @@ __all__ = (
     'Plugin',
     'Modular',
     'modulable',
-    'overridable'
+    'overridable',
+    'alternative'
 )
 
 import os
@@ -101,10 +102,12 @@ class _ModularMeta(type):
             except AttributeError:
                 pass
             else:
-                if isinstance(val, modulable):
+                if isinstance(val, _ModulableMethod):
                     val.inject(mod_fn)
-                elif isinstance(val, overridable):
+                elif isinstance(val, _OverridableMethod):
                     val.override(mod_fn)
+                elif isinstance(val, _AlternativeMethod):
+                    val.alternatively(mod_fn)
 
         cls.loaded_plugins[plugin.name] = plugin
 
@@ -153,11 +156,14 @@ class Modular(metaclass=_ModularMeta, virtual=True):
     """
 
 
-class _WrappedMethodDecorator(functools.partialmethod):
+class _WrappedMethod(functools.partialmethod):
     """
     A callable descriptor which handles method bounding.
     The objects conserves the informations of the provided function.
     """
+
+    def __init__(self):
+        super().__init__(self.__call__)
 
     def _make_unbound_method(self):
         mth = super()._make_unbound_method()
@@ -165,13 +171,13 @@ class _WrappedMethodDecorator(functools.partialmethod):
         return mth
 
 
-class modulable(_WrappedMethodDecorator):
+class _ModulableMethod(_WrappedMethod):
     """
     A method that can have multiple implementations.
     """
 
     def __init__(self, fn, *fns):
-        super().__init__(self.__call__)
+        super().__init__()
         self.fn = fn
         self.fns = list(fns)
         functools.update_wrapper(self, fn)
@@ -188,24 +194,82 @@ class modulable(_WrappedMethodDecorator):
         self.fns.append(fn)
 
 
-class overridable(_WrappedMethodDecorator):
+def modulable(fn):
+    """
+    Decorator for modulable methods.
+    """
+
+    return _ModulableMethod(fn)
+
+
+class _OverridableMethod(_WrappedMethod):
     """
     A method which can be overriden in a plugin, but has only one implementation.
     """
 
     def __init__(self, fn):
+        super().__init__()
         self.fn = fn
         self.overriden = None
         functools.update_wrapper(self, fn)
 
     def __call__(self, obj, *args, **kwds):
-        if self.overriden:
-            self.overriden(obj, *args, **kwds)
+        if self.overriden is not None:
+            return self.overriden(obj, *args, **kwds)
         else:
-            self.fn(obj, *args, **kwds)
+            return self.fn(obj, *args, **kwds)
 
     def __repr__(self):
         return '<overridable method {self.__qualname__} at {id}>'.format(self=self, id=hex(id(self)))
 
-    def inject(self, fn):
+    def override(self, fn):
         self.overriden = fn
+
+
+def overridable(fn):
+    """
+    Decorator for overridable methods.
+    """
+
+    return _OverridableMethod(fn)
+
+
+class _AlternativeMethod(_WrappedMethod):
+    """
+    A method that tests every function alternative until it finds one that
+    doesn't raise an exception.
+    """
+
+    def __init__(self, fn, exc_types):
+        super().__init__()
+        self.fn = fn
+        self.alternatives = []
+        self.exc_types = exc_types
+
+    def __call__(self, obj, *args, **kwds):
+        for alt in self.alternatives:
+            try:
+                return alt(obj, *args, **kwds)
+            except Exception as exc:
+                if isinstance(exc, self.exc_types):
+                    pass
+                elif isinstance(exc, type) and issubclass(exc, self.exc_types):
+                    pass
+                else:
+                    raise
+
+        return self.fn(obj, *args, **kwds)
+
+    def __repr__(self):
+        return '<alternative method {self.__qualname__} at {id}>'.format(self=self, id=hex(id(self)))
+
+    def alternatively(self, fn):
+        self.alternatives.append(fn)
+
+
+def alternative(*exc_types):
+    """
+    Decorator for alternative methods.
+    """
+
+    return functools.partial(_AlternativeMethod, exc_types=exc_types)
