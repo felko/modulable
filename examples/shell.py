@@ -3,7 +3,7 @@
 
 import os
 
-from modular import *
+from modulable import *
 
 # we want to execute this file from the project's root directory because this
 # is where modular.py is located.

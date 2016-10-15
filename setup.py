@@ -3,10 +3,10 @@
 
 from distutils.core import setup
 
-setup(name='modular',
+setup(name='modulable',
       version='1.0',
       description='A lightweight library for writing modular code',
       author='baxbaxwalanuksiwe',
       author_email='baxbaxwalanuksiwe@gmail.com',
-      url='https://github.com/felko/modular'
+      url='https://github.com/felko/modulable'
 )
