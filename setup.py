@@ -6,7 +6,7 @@ import modulable
 from setuptools import setup
 
 
-with open('README.md') as description:
+with open('README.rst') as description:
     setup(
         name='modulable',
         version=modulable.__version__,
