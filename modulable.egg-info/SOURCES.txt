@@ -1,5 +1,0 @@
-setup.py
-modulable.egg-info/PKG-INFO
-modulable.egg-info/SOURCES.txt
-modulable.egg-info/dependency_links.txt
-modulable.egg-info/top_level.txt

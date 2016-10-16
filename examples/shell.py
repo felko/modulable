@@ -29,7 +29,6 @@ class Shell(Modular, plugin_directory='plugins'):
         Initialize the shell.
         """
 
-        self.command_count = 0
         self.running = False
 
 
@@ -41,7 +40,7 @@ class Shell(Modular, plugin_directory='plugins'):
         Updates the current shell.
         """
 
-        self.command_count += 1
+        pass
 
     # We use overridable this time because there can be only one prompt.
     @overridable

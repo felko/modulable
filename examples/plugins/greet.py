@@ -5,7 +5,7 @@ def react(self, i):
     lexemes = i.split()
 
     try:
-        if lexemes[0] == 'hey':
+        if lexemes[0] == 'greet':
             print('Hey', lexemes[1], '!')
         else:
             raise ValueError
