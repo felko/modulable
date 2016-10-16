@@ -9,12 +9,11 @@ from setuptools import setup
 with open('README.md') as description:
     setup(
         name='modulable',
-        version='1.0',
+        version=modulable.__version__,
         description='A lightweight library for writing modular code',
         author='baxbaxwalanuksiwe',
         author_email='baxbaxwalanuksiwe@gmail.com',
-        url='https://github.com/felko/modulable'
-        version=modulable.__version__,
+        url='https://github.com/felko/modulable',
         long_description = description.read(),
         download_url='https://github.com/felko/modulable',
         keywords = [],
