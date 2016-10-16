@@ -8,8 +8,8 @@ maintainable codebase.
 
 The library works with class: the loaded plug-ins are "injected" in
 the given class. You can specify the way of injection, either by stacking
-functions, with the `modulable` decorator, by overloading the base method, with
-the `overridable` decorator, and finally with the `alternative` decorator,
+functions, with the ``modulable`` decorator, by overloading the base method, with
+the ``overridable`` decorator, and finally with the ``alternative`` decorator,
 which runs every function until it finds one that doesn't raise an exception.
 
 Those decorators conserve the original method's informations, such as name,
@@ -31,7 +31,7 @@ own commands and prompt for example.
 This declares a modular class, whose plug-ins are in the ``plugins`` directory
 relative to the current working directory.
 
-The library will load every plug-in (must be a *.py file) in that directory when
+The library will load every plug-in (must be a .py file) in that directory when
 the class is instantiated.
 
 It is convenient to declare a ``init`` method, called within the real
@@ -77,7 +77,6 @@ this type:
 
     @alternative(ValueError)
     def react(self, i):
-        # empty input is skipped
         if i:
             print('Unrecognized command:', repr(i))
 
@@ -125,7 +124,6 @@ The ``greet`` plug-in does the same, with a bit more complex parsing:
             else:
                 raise ValueError
         except IndexError:
-            # if there is less than one word in the input
             raise ValueError
 
 Finally, lets define a prompt that displays the command count:
@@ -144,16 +142,16 @@ Finally, lets define a prompt that displays the command count:
 The plug-ins must be contained in the specified plug-in directory in the class
 declaration, here, ``plugins``. You should have a similar directory tree:
 
-.. code:: plain
+::
 
     .
     ├── plugins
-    │   ├── command_count_prompt.py
-    │   ├── greet.py
-    │   └── quit.py
+    │   ├── command_count_prompt.py
+    │   ├── greet.py
+    │   └── quit.py
     └── shell.py
 
-To use this class, simply instantiate a ``Shell`` object and call it's ``run``
+To use this class, simply instantiate a ``Shell`` object and call its ``run``
 method:
 
 .. code:: python3
@@ -163,7 +161,7 @@ method:
 
 Here's what it does:
 
-.. code:: plain
+::
 
     [0]:
     [1]:
@@ -175,6 +173,8 @@ Here's what it does:
     Unrecognized command: 'unknown command'
     [6]:
     [7]: quit
+
+You can see the complete code in the `example directory`_.
 
 
 Advanced use
@@ -191,26 +191,48 @@ You can also check the loaded plug-ins by typing ``Shell.loaded_plugins``.
 
 Finally, there is an optional ``virtual`` keyword argument at class definition.
 ``virtual`` is set to ``False`` by default, but if set to ``True``, the class
-will not load the plug-ins automatically.
+will not load the plug-ins automatically:
 
+.. code:: python3
+
+    class AbstractShell(Modular, plugins='plugins', virtual=True):
+        ...
 
 
 Installation
 ------------
 
-You should be able to install ``modulable`` with ``pip``:
+* Via `pip`_:
 
 .. code:: bash
 
     $ pip install modulable
 
 
-And, if you're on Linux, if you encounter a permission error, make sure to
+And, if you're on Linux, and face a permission error, make sure to
 run ``sudo`` with the ``-H`` option:
 
 .. code:: bash
 
     $ sudo -H pip install modulable
+
+* Via `git`_:
+
+.. code:: bash
+
+    $ git clone http://github.com/felko/modulable.git
+    $ cd modulable
+    $ sudo -H python3.4 setup.py install
+
+Or, if you're on Windows:
+
+.. code:: bash
+
+    $ git clone http://github.com/felko/modulable.git
+    $ cd modulable
+    $ py -3.4 setup.py install
+
+If you don't have `git`_, you can download the zip file `here <https://github.com/felko/modulable/archive/master.zip>`_.
 
 
 Links
@@ -226,6 +248,12 @@ License
 -------
 
 ``modulable`` is distributed under the `MIT license`_.
+
+
+.. _pip: http://pip.readthedocs.io/
+.. _example directory: https://github.com/felko/modulable/tree/master/examples
+.. _MIT license: http://opensource.org/licenses/MIT
+.. _git: https://git-scm.com/
 
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/modulable.svg

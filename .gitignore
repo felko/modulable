@@ -1,1 +1,11 @@
+# Python bytecode
+__pycache__
+*.py[cod]
+
+# Package
 modulable.egg-info
+modulable-1.0
+
+# Build files
+build
+dist
