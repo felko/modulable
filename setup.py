@@ -1,12 +1,30 @@
 #!/usr/bin/env python3.4
 # coding: utf-8
 
-from distutils.core import setup
+import modulable
 
-setup(name='modulable',
-      version='1.0',
-      description='A lightweight library for writing modular code',
-      author='baxbaxwalanuksiwe',
-      author_email='baxbaxwalanuksiwe@gmail.com',
-      url='https://github.com/felko/modulable'
-)
+from setuptools import setup
+
+
+with open('README.md') as description:
+    setup(
+        name='modulable',
+        version='1.0',
+        description='A lightweight library for writing modular code',
+        author='baxbaxwalanuksiwe',
+        author_email='baxbaxwalanuksiwe@gmail.com',
+        url='https://github.com/felko/modulable'
+        version=modulable.__version__,
+        long_description = description.read(),
+        download_url='https://github.com/felko/modulable',
+        keywords = [],
+        classifiers = [
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: MIT License',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3 :: Only',
+            'Topic :: Software Development',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+            'Topic :: Utilities'
+        ]
+    )
